@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import { v7 as uuidv7 } from "uuid";
 import { SALT_ROUNDS } from "../config/env";
-import { ConflictError, ValidationError } from "../errors/index";
 import type { NewUser, User } from "../types/user.types";
+import { ConflictError, ValidationError } from "../errors/AppError";
 
 const users: NewUser[] = [];
 
