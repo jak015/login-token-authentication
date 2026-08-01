@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { createUser } from '../services/userService';
+import { authenticateUser, createUser } from '../services/userService';
 
 export const register = async (req: Request, res: Response) => {
     const { username, password } = req.body;
@@ -10,6 +10,11 @@ export const register = async (req: Request, res: Response) => {
     return res.status(201).json(newUser);
 };
 
-export const login = (req: Request, res: Response) => {
-    res.status(501).json({ message: 'Login not implemented yet' });
+export const login = async (req: Request, res: Response) => {
+    const { username, password } = req.body;
+
+    const authenticatedUser = await authenticateUser(username, password, req.log);
+    req.log.info({ authenticatedUser }, 'User logged in successfully');
+
+    res.status(200).json(authenticatedUser);
 };

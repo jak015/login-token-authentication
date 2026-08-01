@@ -1,22 +1,16 @@
-import bcrypt from "bcrypt";
 import { v7 as uuidv7 } from "uuid";
-import { SALT_ROUNDS } from "../config/env";
 import type { NewUser, User } from "../types/user.types";
-import { ConflictError, ValidationError } from "../errors/AppError";
+import { AuthenticationError, ConflictError, ValidationError } from "../errors/AppError";
 import { logger } from "../utils/logger";
 import type { Logger } from "pino";
+import { comparePassword, hashPassword } from "../utils/password";
 
 const users: NewUser[] = [];
 const pendingUsernames = new Set<string>();
 
-const encryptPassword = async (password: string): Promise<string> => {
-    return bcrypt.hash(password, SALT_ROUNDS);
-};
-
 const toUser = (user: NewUser): User => ({ id: user.id, username: user.username });
 
 export const createUser = async (username: string, password: string, log: Logger = logger): Promise<User> => {
-
     if (!username || !password) {
         log.warn({ username }, 'User creation failed due to missing credentials');
         throw new ValidationError('Username and password are required');
@@ -30,7 +24,7 @@ export const createUser = async (username: string, password: string, log: Logger
     pendingUsernames.add(username);
 
     try {
-        const encryptedPassword = await encryptPassword(password);
+        const encryptedPassword = await hashPassword(password);
 
         const newUser: NewUser = {
             id: uuidv7(),
@@ -44,4 +38,26 @@ export const createUser = async (username: string, password: string, log: Logger
     } finally {
         pendingUsernames.delete(username);
     }
+};
+
+export const authenticateUser = async (username: string, password: string, log: Logger = logger): Promise<User> => {
+    if (!username || !password) {
+        log.warn({ username }, 'Authentication failed due to missing credentials');
+        throw new ValidationError('Username and password are required');
+    }
+
+    const user = users.find((u) => u.username === username);
+    if (!user) {
+        log.warn({ username }, 'Authentication failed because the user does not exist');
+        throw new AuthenticationError();
+    }
+
+    const isPasswordValid = await comparePassword(password, user.passwordHash);
+    if (!isPasswordValid) {
+        log.warn({ username }, 'Authentication failed due to invalid password');
+        throw new AuthenticationError();
+    }
+
+    log.info({ userId: user.id, username }, 'User authenticated successfully');
+    return toUser(user);
 };
