@@ -33,7 +33,7 @@ export const createUser = async (username: string, password: string, log: Logger
         };
 
         users.push(newUser);
-        log.info({ userId: newUser.id, username }, 'User created successfully');
+        log.info({ userId: newUser.id }, 'User created successfully');
         return toUser(newUser);
     } finally {
         pendingUsernames.delete(username);
@@ -42,22 +42,22 @@ export const createUser = async (username: string, password: string, log: Logger
 
 export const authenticateUser = async (username: string, password: string, log: Logger = logger): Promise<User> => {
     if (!username || !password) {
-        log.warn({ username }, 'Authentication failed due to missing credentials');
+        log.warn('Authentication failed due to missing credentials');
         throw new ValidationError('Username and password are required');
     }
 
     const user = users.find((u) => u.username === username);
     if (!user) {
-        log.warn({ username }, 'Authentication failed because the user does not exist');
+        log.warn('Authentication failed because the user does not exist');
         throw new AuthenticationError();
     }
 
     const isPasswordValid = await comparePassword(password, user.passwordHash);
     if (!isPasswordValid) {
-        log.warn({ username }, 'Authentication failed due to invalid password');
+        log.warn('Authentication failed due to invalid password');
         throw new AuthenticationError();
     }
 
-    log.info({ userId: user.id, username }, 'User authenticated successfully');
+    log.info({ userId: user.id }, 'User authenticated successfully');
     return toUser(user);
 };
