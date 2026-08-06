@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from 'uuid';
 import pino from 'pino';
-import pinoHttp from 'pino-http';
+import { pinoHttp } from 'pino-http';
 
 export const logger = pino({
     level: process.env.LOG_LEVEL ?? 'info',
