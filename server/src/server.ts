@@ -1,4 +1,4 @@
-import express, { type Request, type Response } from 'express';
+import express from 'express';
 import cors from 'cors';
 import { clientUrl, port } from './config/env';
 import authRoutes from './routes/authRoutes';
