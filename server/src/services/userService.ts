@@ -8,12 +8,19 @@ import { comparePassword, hashPassword } from "../utils/password";
 const users: NewUser[] = [];
 const pendingUsernames = new Set<string>();
 
+const MIN_PASSWORD_LENGTH = 10;
+
 const toUser = (user: NewUser): User => ({ id: user.id, username: user.username });
 
 export const createUser = async (username: string, password: string, log: Logger = logger): Promise<User> => {
     if (!username || !password) {
         log.warn({ username }, 'User creation failed due to missing credentials');
         throw new ValidationError('Username and password are required');
+    }
+
+    if (password.length < MIN_PASSWORD_LENGTH) {
+        log.warn({ username }, 'User creation failed because the password is too short');
+        throw new ValidationError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
     }
 
     if (pendingUsernames.has(username) || users.some((u) => u.username === username)) {
