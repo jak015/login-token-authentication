@@ -1,4 +1,9 @@
+import { useState } from "react";
+import { Form, Link, useNavigate } from "react-router";
 import type { Route } from "./+types/register";
+import { useRegister } from "~/hooks/auth/useRegister";
+
+const MIN_PASSWORD_LENGTH = 10;
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -8,5 +13,88 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export default function Register() {
-    return (<main>Hello, Register!</main>);
+    const registerMutation = useRegister();
+    const navigate = useNavigate();
+    const isPending = registerMutation.isPending;
+    const [passwordError, setPasswordError] = useState("");
+    const [confirmPasswordError, setConfirmPasswordError] = useState("");
+
+    const clearErrors = () => {
+        setPasswordError("");
+        setConfirmPasswordError("");
+    };
+
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+
+        const username = formData.get("username");
+        const password = formData.get("password");
+        const confirmPassword = formData.get("confirmPassword");
+
+        if (typeof username !== "string" || typeof password !== "string" || typeof confirmPassword !== "string") {
+            return;
+        }
+
+        if (password.length < MIN_PASSWORD_LENGTH) {
+            setPasswordError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setConfirmPasswordError("Passwords do not match");
+            return;
+        }
+
+        clearErrors();
+        registerMutation.mutate(
+            { username, password },
+            { onSuccess: () => navigate("/") }
+        );
+    }
+
+    return (
+        <main className="flex mx-auto flex-row items-center gap-10 justify-center min-h-screen bg-gray-900 text-white">
+            <section>
+                <h1 className="font-bold text-2xl text-center mb-4">Register</h1>
+                <Form onSubmit={handleSubmit} method="post" className="flex flex-col gap-2">
+                    <label htmlFor="username">Username:</label>
+                    <input type="text" id="username" name="username" className="bg-white rounded-sm text-black pl-1" required />
+
+                    <label htmlFor="password">Password:</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        className="bg-white rounded-sm text-black pl-1"
+                        aria-invalid={!!passwordError}
+                        aria-describedby={passwordError ? "password-error" : undefined}
+                        onChange={clearErrors} required />
+                    {passwordError && <p id="password-error" className="text-red-400 text-sm">{passwordError}</p>}
+
+                    <label htmlFor="confirmPassword">Confirm Password:</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        className="bg-white rounded-sm text-black pl-1"
+                        aria-invalid={!!confirmPasswordError}
+                        aria-describedby={confirmPasswordError ? "confirm-password-error" : undefined}
+                        onChange={clearErrors} required />
+                    {confirmPasswordError && <p id="confirm-password-error" className="text-red-400 text-sm">{confirmPasswordError}</p>}
+
+                    <button
+                        type="submit"
+                        disabled={isPending}
+                        aria-busy={isPending}
+                        className="flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        {isPending ? "Registering..." : "Register"}
+                    </button>
+                </Form>
+
+                <p>Already have an account? <Link to="/">Login here</Link></p>
+            </section>
+        </main >
+    );
 }
