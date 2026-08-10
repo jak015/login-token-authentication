@@ -27,7 +27,10 @@ export default function Login() {
 
     loginMutation.mutate(
       { username, password },
-      { onSuccess: () => navigate("/welcome") }
+      {
+        onSuccess: (user: { id: string; username: string }) =>
+          navigate("/dashboard", { state: { user } }),
+      }
     );
   }
 
