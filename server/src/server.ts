@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { clientUrl, port } from './config/env';
+import { env } from './config/env';
 import authRoutes from './routes/authRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { httpLogger, logger } from './utils/logger';
@@ -8,7 +8,7 @@ import { httpLogger, logger } from './utils/logger';
 const app = express();
 
 app.use(cors({
-    origin: clientUrl,
+    origin: env.clientUrl,
     credentials: true
 }));
 
@@ -19,6 +19,6 @@ app.use('/api/auth', authRoutes);
 
 app.use(errorHandler);
 
-app.listen(port, () => {
-    logger.info(`Server started successfully, on port: ${port}`);
+app.listen(env.port, () => {
+    logger.info(`Server started successfully, on port: ${env.port}`);
 });

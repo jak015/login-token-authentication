@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Route } from "./+types/dashboard";
+import type { User } from "~/types/user.types";
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -10,8 +11,6 @@ export function meta({ }: Route.MetaArgs) {
     ];
 }
 
-type DashboardUser = { id: string; username: string };
-
 export default function Dashboard() {
     const location = useLocation();
     const navigate = useNavigate();
@@ -19,7 +18,7 @@ export default function Dashboard() {
     const [confirming, setConfirming] = useState(false);
     const resetTimer = useRef<number | null>(null);
 
-    const user = (location.state as { user?: DashboardUser } | null)?.user;
+    const user = (location.state as { user?: User } | null)?.user;
 
     // Clear the pending confirmation timer if the component unmounts (e.g. navigation)
     useEffect(() => {
@@ -58,11 +57,10 @@ export default function Dashboard() {
                 <button
                     type="button"
                     onClick={handleLogoutClick}
-                    className={`self-center mt-6 rounded-md px-3 py-1.5 text-sm font-semibold transition-colors ${
-                        confirming
+                    className={`self-center mt-6 rounded-md px-3 py-1.5 text-sm font-semibold transition-colors ${confirming
                             ? "bg-red-600 text-white hover:bg-red-500"
                             : "bg-white text-gray-900 hover:bg-red-600 hover:text-white"
-                    }`}
+                        }`}
                 >
                     {confirming ? "Confirm logout?" : "Logout"}
                 </button>

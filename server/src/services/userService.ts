@@ -8,21 +8,9 @@ import { comparePassword, hashPassword } from "../utils/password";
 const users: NewUser[] = [];
 const pendingUsernames = new Set<string>();
 
-const MIN_PASSWORD_LENGTH = 10;
-
 const toUser = (user: NewUser): User => ({ id: user.id, username: user.username });
 
 export const createUser = async (username: string, password: string, log: Logger = logger): Promise<User> => {
-    if (!username || !password) {
-        log.warn({ username }, 'User creation failed due to missing credentials');
-        throw new ValidationError('Username and password are required');
-    }
-
-    if (password.length < MIN_PASSWORD_LENGTH) {
-        log.warn({ username }, 'User creation failed because the password is too short');
-        throw new ValidationError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
-    }
-
     if (pendingUsernames.has(username) || users.some((u) => u.username === username)) {
         log.warn({ username }, 'User creation failed because the username already exists');
         throw new ConflictError('Username is already taken');
@@ -48,11 +36,6 @@ export const createUser = async (username: string, password: string, log: Logger
 };
 
 export const authenticateUser = async (username: string, password: string, log: Logger = logger): Promise<User> => {
-    if (!username || !password) {
-        log.warn('Authentication failed due to missing credentials');
-        throw new ValidationError('Username and password are required');
-    }
-
     const user = users.find((u) => u.username === username);
     if (!user) {
         log.warn('Authentication failed because the user does not exist');
@@ -66,5 +49,15 @@ export const authenticateUser = async (username: string, password: string, log: 
     }
 
     log.info({ userId: user.id }, 'User authenticated successfully');
+    return toUser(user);
+};
+
+export const getUserById = async (id: string, log: Logger = logger): Promise<User | undefined> => {
+    const user = users.find((u) => u.id === id);
+    if (!user) {
+        log.warn({ userId: id }, 'User not found');
+        return undefined;
+    }
+
     return toUser(user);
 };
