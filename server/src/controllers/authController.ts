@@ -35,6 +35,7 @@ export const login = async (req: Request, res: Response) => {
     const { username, password } = validateCredentials(req.body);
 
     const authenticatedUser = await authenticateUser(username, password, req.log);
+    const token = signToken(authenticatedUser);
     req.log.info({ userId: authenticatedUser.id }, 'User logged in successfully');
 
     res.cookie('token', token, { ...COOKIE_OPTIONS, maxAge: env.jwtExpiresIn * 1000 });
