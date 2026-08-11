@@ -4,8 +4,11 @@ import { env } from './config/env';
 import authRoutes from './routes/authRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { httpLogger, logger } from './utils/logger';
+import cookieParser from 'cookie-parser';
 
 const app = express();
+
+app.use(cookieParser());
 
 app.use(cors({
     origin: env.clientUrl,
