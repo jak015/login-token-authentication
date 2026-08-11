@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
-import { SALT_ROUNDS } from "../config/env";
+import { env } from "../config/env";
 
 export const hashPassword = async (password: string): Promise<string> => {
-    return bcrypt.hash(password, SALT_ROUNDS);
+    return bcrypt.hash(password, env.saltRounds);
 };
 
 export const comparePassword = async (password: string, passwordHash: string): Promise<boolean> => {

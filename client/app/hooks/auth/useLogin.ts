@@ -1,17 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { login } from "../../services/authService"
-
-type loginCredentials = {
-    username: string;
-    password: string;
-}
+import type { Credentials } from "~/types/auth.types";
 
 export const useLogin = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationKey: ["login"],
-        mutationFn: (credentials: loginCredentials) => login(credentials.username, credentials.password),
+        mutationFn: (credentials: Credentials) => login(credentials),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["user"] });
         }
