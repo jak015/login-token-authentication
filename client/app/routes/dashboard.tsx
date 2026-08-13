@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Route } from "./+types/dashboard";
-import type { User } from "~/types/user.types";
+import { useUser } from "~/hooks/auth/useUser";
+import { logout } from "~/services/authService";
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -12,15 +13,12 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export default function Dashboard() {
-    const location = useLocation();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { data: user } = useUser();
     const [confirming, setConfirming] = useState(false);
     const resetTimer = useRef<number | null>(null);
 
-    const user = (location.state as { user?: User } | null)?.user;
-
-    // Clear the pending confirmation timer if the component unmounts (e.g. navigation)
     useEffect(() => {
         return () => {
             if (resetTimer.current !== null) {
@@ -29,11 +27,13 @@ export default function Dashboard() {
         };
     }, []);
 
-    const handleLogout = () => {
-        // Clear any cached user data (e.g. the ["user"] query invalidated on login)
-        queryClient.removeQueries({ queryKey: ["user"] });
-        // replace: true so the back button doesn't return to the dashboard
-        navigate("/", { replace: true });
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } finally {
+            queryClient.removeQueries({ queryKey: ["user"] });
+            navigate("/", { replace: true });
+        }
     };
 
     const handleLogoutClick = () => {
@@ -42,7 +42,6 @@ export default function Dashboard() {
             return;
         }
         setConfirming(true);
-        // Auto-cancel the confirmation after 3 seconds if not clicked again
         resetTimer.current = window.setTimeout(() => setConfirming(false), 3000);
     };
 
@@ -58,8 +57,8 @@ export default function Dashboard() {
                     type="button"
                     onClick={handleLogoutClick}
                     className={`self-center mt-6 rounded-md px-3 py-1.5 text-sm font-semibold transition-colors ${confirming
-                            ? "bg-red-600 text-white hover:bg-red-500"
-                            : "bg-white text-gray-900 hover:bg-red-600 hover:text-white"
+                        ? "bg-red-600 text-white hover:bg-red-500"
+                        : "bg-white text-gray-900 hover:bg-red-600 hover:text-white"
                         }`}
                 >
                     {confirming ? "Confirm logout?" : "Logout"}
