@@ -55,46 +55,57 @@ export default function Register() {
     }
 
     return (
-        <main className="flex mx-auto flex-row items-center gap-10 justify-center min-h-screen bg-gray-900 text-white">
-            <section>
-                <h1 className="font-bold text-2xl text-center mb-4">Register</h1>
-                <Form onSubmit={handleSubmit} method="post" className="flex flex-col gap-2">
-                    <label htmlFor="username">Username:</label>
-                    <input type="text" id="username" name="username" className="bg-white rounded-sm text-black pl-1" required />
+        <main className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+            <article className="flex flex-col items-center gap-5 rounded-2xl border border-white bg-gray-800 p-10 shadow-lg">
+                <Link to="/" className="self-start text-sm text-gray-400 transition-colors hover:text-white">
+                    ← Back
+                </Link>
+                <h1 className="font-bold text-2xl text-center">Register</h1>
+                <Form onSubmit={handleSubmit} method="post" className="flex flex-col gap-5 w-80">
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="username">Username:</label>
+                        <input type="text" id="username" name="username" className="bg-white rounded-sm text-black px-2 py-1" required />
+                    </div>
 
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        className="bg-white rounded-sm text-black pl-1"
-                        aria-invalid={!!passwordError}
-                        aria-describedby={passwordError ? "password-error" : undefined}
-                        onChange={clearErrors} required />
-                    {passwordError && <p id="password-error" className="text-red-400 text-sm">{passwordError}</p>}
 
-                    <label htmlFor="confirmPassword">Confirm Password:</label>
-                    <input
-                        type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        className="bg-white rounded-sm text-black pl-1"
-                        aria-invalid={!!confirmPasswordError}
-                        aria-describedby={confirmPasswordError ? "confirm-password-error" : undefined}
-                        onChange={clearErrors} required />
-                    {confirmPasswordError && <p id="confirm-password-error" className="text-red-400 text-sm">{confirmPasswordError}</p>}
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="password">Password:</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            className="bg-white rounded-sm text-black px-2 py-1"
+                            aria-invalid={!!passwordError}
+                            aria-describedby={passwordError ? "password-error" : undefined}
+                            onChange={clearErrors} required />
+                        {passwordError && <p id="password-error" className="text-red-400 text-sm">{passwordError}</p>}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="confirmPassword">Confirm Password:</label>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            className="bg-white rounded-sm text-black px-2 py-1"
+                            aria-invalid={!!confirmPasswordError}
+                            aria-describedby={confirmPasswordError ? "confirm-password-error" : undefined}
+                            onChange={clearErrors} required />
+                        {confirmPasswordError && <p id="confirm-password-error" className="text-red-400 text-sm">{confirmPasswordError}</p>}
+                    </div>
+
 
                     <button
                         type="submit"
                         disabled={isPending}
                         aria-busy={isPending}
-                        className="flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        className="mt-4 bg-white text-black rounded-sm px-4 py-2 transition-colors hover:bg-gray-300 active:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
                         {isPending ? "Registering..." : "Register"}
                     </button>
                 </Form>
 
-                <p>Already have an account? <Link to="/login">Login here</Link></p>
-            </section>
+                <p>Already have an account? <Link to="/login" className="text-blue-400 underline hover:text-blue-300">Login here</Link></p>
+            </article>
         </main >
     );
 }
