@@ -8,7 +8,7 @@ import { authSchema } from '../schemas/auth.schema';
 const COOKIE_OPTIONS = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax' as const
+    sameSite: 'none' as const,
 };
 
 const validateCredentials = (body: unknown) => {
