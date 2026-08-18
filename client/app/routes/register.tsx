@@ -50,7 +50,7 @@ export default function Register() {
         clearErrors();
         registerMutation.mutate(
             { username, password },
-            { onSuccess: () => navigate("/") }
+            { onSuccess: () => navigate("/login") }
         );
     }
 
@@ -93,7 +93,7 @@ export default function Register() {
                     </button>
                 </Form>
 
-                <p>Already have an account? <Link to="/">Login here</Link></p>
+                <p>Already have an account? <Link to="/login">Login here</Link></p>
             </section>
         </main >
     );
