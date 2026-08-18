@@ -27,36 +27,37 @@ export default function Login() {
 
     loginMutation.mutate(
       { username, password },
-      {
-        onSuccess: (user) =>
-          navigate("/dashboard", { state: { user } }),
-      }
+      { onSuccess: () => navigate("/dashboard") }
     );
   }
 
   return (
-    <main className="flex mx-auto flex-row items-center gap-10 justify-center min-h-screen bg-gray-900 text-white">
-      <section>
-        <h1 className="font-bold text-2xl text-center mb-4">Login</h1>
-        <Form onSubmit={handleSubmit} method="post" className="flex flex-col gap-2">
-          <label htmlFor="username">Username:</label>
-          <input type="text" id="username" name="username" className="bg-white rounded-sm text-black pl-1" required />
+    <main className="flex flex-col items-center justify-center gap-6 min-h-screen bg-gray-900 text-white">
+      <article className="flex flex-col items-center gap-5 rounded-2xl border border-white bg-gray-800 p-10 shadow-lg">
+        <Link to="/" className="self-start text-sm text-gray-400 transition-colors hover:text-white">
+          ← Back
+        </Link>
+        <h1 className="font-bold text-2xl text-center">Login</h1>
+        <Form onSubmit={handleSubmit} method="post" className="flex flex-col gap-5 w-80">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="username">Username:</label>
+            <input type="text" id="username" name="username" className="bg-white rounded-sm text-black px-2 py-1" required />
+          </div>
 
-          <label htmlFor="password">Password:</label>
-          <input type="password" id="password" name="password" className="bg-white rounded-sm text-black pl-1" required />
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password">Password:</label>
+            <input type="password" id="password" name="password" className="bg-white rounded-sm text-black px-2 py-1" required />
+          </div>
 
-          <button type="submit">Login</button>
+          <button
+            type="submit"
+            className="mt-4 bg-white text-black rounded-sm px-4 py-2 transition-colors hover:bg-gray-300 active:bg-gray-400">
+            Login
+          </button>
         </Form>
 
-        <p>Don't have an account? <Link to="/register">Register here</Link></p>
-      </section >
-
-      <div className="bg-white w-0.5 h-40" />
-
-      <section>
-        <h2><strong>Important Info</strong></h2>
-        <p>Do to..</p>
-      </section>
+        <p>Don't have an account? <Link to="/register" className="text-blue-400 underline hover:text-blue-300">Register here</Link></p>
+      </article>
     </main >
   );
 }
