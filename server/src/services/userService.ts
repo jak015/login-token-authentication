@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import type { NewUser, User } from "../types/user.types";
-import { AuthenticationError, ConflictError, ValidationError } from "../errors/AppError";
+import { AuthenticationError, ConflictError } from "../errors/AppError";
 import { logger } from "../utils/logger";
 import type { Logger } from "pino";
 import { comparePassword, hashPassword } from "../utils/password";
@@ -10,8 +10,10 @@ const pendingUsernames = new Set<string>();
 
 const toUser = (user: NewUser): User => ({ id: user.id, username: user.username });
 
+const findByUsername = (username: string) => users.find((u) => u.username === username);
+
 export const createUser = async (username: string, password: string, log: Logger = logger): Promise<User> => {
-    if (pendingUsernames.has(username) || users.some((u) => u.username === username)) {
+    if (pendingUsernames.has(username) || findByUsername(username)) {
         log.warn({ username }, 'User creation failed because the username already exists');
         throw new ConflictError('Username is already taken');
     }
@@ -36,7 +38,7 @@ export const createUser = async (username: string, password: string, log: Logger
 };
 
 export const authenticateUser = async (username: string, password: string, log: Logger = logger): Promise<User> => {
-    const user = users.find((u) => u.username === username);
+    const user = findByUsername(username);
     if (!user) {
         log.warn('Authentication failed because the user does not exist');
         throw new AuthenticationError();

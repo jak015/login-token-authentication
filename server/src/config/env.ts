@@ -20,6 +20,8 @@ const requireEnv = (key: string, minLength?: number) => {
 };
 
 export const env = {
+    nodeEnv: process.env.NODE_ENV ?? 'development',
+    isProduction: process.env.NODE_ENV === 'production',
     port: envNumber(process.env.PORT, 3000),
     saltRounds: envNumber(process.env.SALT_ROUNDS, 12),
     clientUrl: requireEnv("CLIENT_URL"),
