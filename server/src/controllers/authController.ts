@@ -1,15 +1,9 @@
 import type { Request, Response } from 'express';
 import { authenticateUser, createUser, getUserById } from '../services/userService';
 import { signToken } from '../utils/jwt';
-import { env } from '../config/env';
+import { clearTokenCookie, setTokenCookie } from '../config/cookies';
 import { AuthenticationError, ValidationError } from '../errors/AppError';
 import { authSchema } from '../schemas/auth.schema';
-
-const COOKIE_OPTIONS = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none' as const,
-};
 
 const validateCredentials = (body: unknown) => {
     const result = authSchema.safeParse(body);
@@ -38,12 +32,12 @@ export const login = async (req: Request, res: Response) => {
     const token = signToken(authenticatedUser);
     req.log.info({ userId: authenticatedUser.id }, 'User logged in successfully');
 
-    res.cookie('token', token, { ...COOKIE_OPTIONS, maxAge: env.jwtExpiresIn * 1000 });
+    setTokenCookie(res, token);
     return res.status(200).json(authenticatedUser);
 };
 
 export const logout = (req: Request, res: Response) => {
-    res.clearCookie('token', COOKIE_OPTIONS);
+    clearTokenCookie(res);
     return res.status(200).json({ message: 'Logged out successfully' });
 };
 
